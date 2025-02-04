@@ -1,0 +1,98 @@
+{% for item in data %}
+<div class="tab-content" id="{{ item.製令單號 }}">
+    <table class="table">
+        <tbody>
+            <tr style="background-color: transparent;">
+                <td style="width: 10%;">
+                    <button style="border-style: none; background-color: transparent; color: red" type="button" data-bs-toggle="modal" data-bs-target="#Modal{{ item.製令單號 }}">
+                        &lt;{{ item.製令單號 }}&gt;
+                    </button>
+                </td>
+                <td style="width: 10%; text-align: center;">{{ item.型體編號 }}</td>
+                <td style="width: 15%; text-align: center;">{{ item.上傳日期 }}</td>
+                <td style="width: 15%; text-align: center;">{{ item.上次編輯日期 }}</td>
+                <td style="width: 20%; text-align: center;">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-11" style="padding-left:0px;">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width:{{ item.派工進度 }}%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1" style="font-size:10px;padding-left:0px;">{{ item.派工進度 }}%</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="width: 30%; text-align: center;">
+                    <a href="CuttingDispatchSystem.html?s={{ item.製令單號 }}" style="text-decoration:none;">
+                        <button type="button" class="btn btn-outline-dark">進入剪裁派工</button>
+                    </a>
+                    <a href="CuttingDispatchList.html?workorderNumber={{ item.製令單號 }}" style="text-decoration:none;">
+                        <button type="button" class="btn btn-outline-success">管理派工單</button>
+                    </a>
+
+                    <!-- 刪除表單 -->
+                    <form action="{% url 'remove_item' item.製令單號 %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger">刪除派工單</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="modal fade" id="Modal{{ item.製令單號 }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4><strong>物料清單</strong></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row" style="margin-top: 5px;">
+                            <div class="col-8">
+                                <div class="p-2 bd-highlight">製令單號：&nbsp;{{ item.製令單號 }}</div>
+                                <div class="p-2 bd-highlight">型體編號：&nbsp;{{ item.型體編號 }}</div>
+                                <div class="p-2 bd-highlight">型體名稱：&nbsp;{{ item.型體名稱 }}</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-2 bd-highlight">楦頭：&nbsp;{{ item.楦頭 }}</div>
+                                <div class="p-2 bd-highlight">大底：&nbsp;{{ item.大底 }}</div>
+                                <div class="p-2 bd-highlight">配色：&nbsp;{{ item.顏色 }}</div>
+                                <div class="p-2 bd-highlight">LOGO：&nbsp;{{ item.logo }}</div>
+                            </div>
+                        </div>
+                        <table class="table table-bordered">
+                            <thead style="background-color: #EDEDED;">
+                                <tr>
+                                    <th scope="col">部位名稱</th>
+                                    <th scope="col">材料</th>
+                                    <th scope="col">本批數量全</th>
+                                    <th scope="col" style="text-align: center;">單位</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background-color: #F7F7F7;">
+                                {% for detail in item.details %}
+                                <tr>
+                                    <td>{{ detail.部位名稱 }}</td>
+                                    <td>{{ detail.材料 }}</td>
+                                    <td>{{ detail.本批數量全 }}</td>
+                                    <td>{{ detail.單位 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- 自動刷新表單 -->
+<form action="{% url 'refresh_data' %}" method="get">
+    <button type="submit" class="btn btn-outline-primary">重新加載數據</button>
+</form>

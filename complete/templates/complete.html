@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>製令單表格</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>製令單表格</h1>
+    <div id="table-container"></div>
+
+    <script>
+        const workorderNumber = new URLSearchParams(window.location.search).get('workorderNumber');
+
+        // 獲取表格數據
+        function getTable() {
+            $.get(`/api/get_table/?workorderNumber=${workorderNumber}`, function (data) {
+                let tableContent = `
+                    <table border="1">
+                        <thead>
+                            <tr>
+                                <th>製令單號</th>
+                                <th>部位</th>
+                                <th>尺寸</th>
+                                <th>總數量</th>
+                                <th>完成數量</th>
+                                <th>未完成數量</th>
+                                <th>進度</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                data.forEach(row => {
+                    tableContent += `
+                        <tr>
+                            <td>${row.workorder_number}</td>
+                            <td>${row.part}</td>
+                            <td>${row.size}</td>
+                            <td>${row.quantity}</td>
+                            <td>${row.completed_quantity}</td>
+                            <td>${row.incomplete_quantity}</td>
+                            <td>${row.progress}%</td>
+                            <td>
+                                <button onclick="editTable('${row.part}', '${row.size}')">編輯</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tableContent += `</tbody></table>`;
+                $('#table-container').html(tableContent);
+            });
+        }
+
+        // 編輯完成數量
+        function editTable(part, size) {
+            const completedQuantity = prompt("請輸入完成數量：");
+            if (completedQuantity) {
+                $.post('/api/update_table/', {
+                    workorder_number: workorderNumber,
+                    part: part,
+                    size: size,
+                    completed_quantity: completedQuantity,
+                }, function (response) {
+                    alert(response.message);
+                    getTable();
+                });
+            }
+        }
+
+        $(document).ready(function () {
+            getTable();
+        });
+    </script>
+</body>
+</html>
