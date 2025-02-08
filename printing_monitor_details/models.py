@@ -1,3 +1,5 @@
+from django.db import models
+
 class PrintingProduction(models.Model):
     order = models.ForeignKey(PrintingOrder, on_delete=models.CASCADE, related_name="productions")
     section = models.CharField(max_length=255)  # 部位名稱
